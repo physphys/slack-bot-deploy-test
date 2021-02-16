@@ -8,7 +8,7 @@ workflows:
       - aws-ecr/build-and-push-image:
           region: AWS_DEFAULT_REGION
           account-url: AWS_ACCOUNT_URL
-          repo: 'physphys/slack-bot-deploy-test' # GitHubのリポジトリ名
+          repo: "test"
           tag: "${CIRCLE_SHA1}"
       - aws-ecs/deploy-service-update:
           requires:

@@ -1,0 +1,20 @@
+version: 2.1
+orbs:
+  aws-ecr: circleci/aws-ecr@6.1.0
+  aws-ecs: circleci/aws-ecs@0.0.8
+workflows:
+  build_and_push_image:
+  jobs:
+    - aws-ecr/build-and-push-image:
+      region: ${AWS_DEFAULT_REGION}
+      account-url: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+      repo: 'physphys/slack-bot-deploy-test'　# GitHubのリポジトリ名
+      tag: "${CIRCLE_SHA1}"
+    - aws-ecs/deploy-service-update:
+      requires:
+        - aws-ecr/build-and-push-image
+      aws-region: ${AWS_DEFAULT_REGION}
+      family: "test"　# ECSのタスク定義名
+      cluster-name: "slack-bot-deploy-test"　# ECSクラスター名
+      service-name: "test"　# ECSのサービス名
+      container-image-name-updates: 'container=test,tag=${CIRCLE_SHA1}'　# タスク定義で指定しているコンテナ名
